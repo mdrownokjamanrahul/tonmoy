@@ -1437,31 +1437,50 @@
             }
         }
 
-        function showExpired() {
-            const tbody = document.getElementById('inventoryTable');
-            tbody.innerHTML = '';
+function showExpired() {
+    const tbody = document.getElementById('inventoryTable');
+    tbody.innerHTML = '';
 
-            const expiredProducts = Object.values(products).filter(p => new Date(p.expiryDate) < new Date());
+    const today = new Date();
+    const sixtyDaysLater = new Date();
+    sixtyDaysLater.setDate(today.getDate() + 60);
 
-            expiredProducts.forEach(product => {
-                const row = document.createElement('tr');
-                row.classList.add('expired');
-                
-                row.innerHTML = `
-                    <td>${product.name}</td>
-                    <td>${product.company}</td>
-                    <td>${product.stock}</td>
-                    <td>${product.unit}</td>
-                    <td>${formatDate(product.expiryDate)}</td>
-                    <td>মেয়াদোত্তীর্ণ</td>
-                `;
-                tbody.appendChild(row);
-            });
+    const expiredProducts = Object.values(products).filter(p => {
+        const expiryDate = new Date(p.expiryDate);
+        return expiryDate <= sixtyDaysLater; // আজ থেকে ৬০ দিনের ভেতরে
+    });
 
-            if (expiredProducts.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #666;">মেয়াদোত্তীর্ণ কোন পণ্য নেই</td></tr>';
-            }
+    expiredProducts.forEach(product => {
+        const expiryDate = new Date(product.expiryDate);
+        const diffTime = expiryDate - today;
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); // কতদিন বাকি আছে
+
+        let statusText = '';
+        if (diffDays < 0) {
+            statusText = 'মেয়াদ শেষ';
+        } else {
+            statusText = diffDays + ' দিন বাকি';
         }
+
+        const row = document.createElement('tr');
+        row.classList.add('expired');
+        
+        row.innerHTML = `
+            <td>${product.name}</td>
+            <td>${product.company}</td>
+            <td>${product.stock}</td>
+            <td>${product.unit}</td>
+            <td>${formatDate(product.expiryDate)}</td>
+            <td>${statusText}</td>
+        `;
+        tbody.appendChild(row);
+    });
+
+    if (expiredProducts.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #666;">মেয়াদোত্তীর্ণ কোন পণ্য নেই</td></tr>';
+    }
+}
+
 
         // Make inventory functions global
         window.loadInventoryTable = loadInventoryTable;
@@ -1769,4 +1788,5 @@
 </body>
 
 </html>
+
 
