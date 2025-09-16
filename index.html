@@ -1564,7 +1564,7 @@ function showExpired() {
             tbody.innerHTML = '';
 
             customer.sales.sort((a, b) => new Date(b.date) - new Date(a.date)).forEach(sale => {
-                const medicines = sale.items.map(item => `${item.name} (${item.quantity})`).join(', ');
+                const medicines = sale.items.map(item => `${item.name}`).join(', ');
                 
                 const row = document.createElement('tr');
                 row.innerHTML = `
@@ -1788,5 +1788,6 @@ function showExpired() {
 </body>
 
 </html>
+
 
 
